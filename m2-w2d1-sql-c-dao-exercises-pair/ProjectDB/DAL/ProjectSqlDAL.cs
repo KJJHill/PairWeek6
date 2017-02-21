@@ -11,10 +11,9 @@ namespace ProjectDB.DAL
     public class ProjectSqlDAL
     {
         private const string SQL_GetProject = "SELECT project_id, name, from_date, to_date FROM project;";
-        private const string SQL_CreateProject = @"INSERT INTO project(project.name, project.from_date, project.to_date) VALUES (@projectname, @startdate, @enddate); ";
-        private const string SQL_SelectProject = "SELECT project_id, name, from_date, to_date FROM project WHERE name = @projectname;";
+        private const string SQL_CreateProject = @"IF NOT EXISTS (SELECT * FROM project WHERE project.name = @projectname) INSERT INTO project(project.name, project.from_date, project.to_date) VALUES (@projectname, @startdate, @enddate); ";
         private const string SQL_RemoveEmployee = @"DELETE FROM project_employee WHERE project_employee.employee_id= @employeeid;";
-        private const string SQL_AssignEmployee = @"INSERT INTO project_employee(project_id, employee_id) VALUES (@projectid, @employeeid);";
+        private const string SQL_AssignEmployee = @"IF NOT EXISTS (SELECT * FROM project_employee WHERE project_employee.project_id = @projectid AND project_employee.employee_id = @employeeid) INSERT INTO project_employee(project_id, employee_id) VALUES (@projectid, @employeeid);";
         
 
         private string connectionString;
@@ -69,20 +68,7 @@ namespace ProjectDB.DAL
                     cmd.Parameters.AddWithValue("@employeeid", employeeId);
                     int selectedRowsAffected = cmd.ExecuteNonQuery();
 
-                    //if (selectedRowsAffected == -1)
-                    //{
-                    //    SqlCommand updcmd = new SqlCommand(SQL_CreateDepartment, conn);
-
-                    //    updcmd.Parameters.AddWithValue("@departmentname", newDepartment.Name);
-
-                    //    int updaterowsAffected = updcmd.ExecuteNonQuery();
-
-                    //    return (updaterowsAffected == 1);
-                    //}
-                    //else
-                    //{
-                    //    return false;
-                    //}
+                    
                     return (selectedRowsAffected == 1);
                 }
 
@@ -124,12 +110,7 @@ namespace ProjectDB.DAL
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    SqlCommand cmd = new SqlCommand(SQL_SelectProject, conn);
-                    cmd.Parameters.AddWithValue("@projectname", newProject.Name);
-                    int selectedRowsAffected = cmd.ExecuteNonQuery();
-
-                    if (selectedRowsAffected == -1)
-                    {
+                   
                         SqlCommand updcmd = new SqlCommand(SQL_CreateProject, conn);
 
                         updcmd.Parameters.AddWithValue("@projectname", newProject.Name);
@@ -139,11 +120,8 @@ namespace ProjectDB.DAL
                         int updaterowsAffected = updcmd.ExecuteNonQuery();
 
                         return (updaterowsAffected == 1);
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    
+                    
                 }
 
             }

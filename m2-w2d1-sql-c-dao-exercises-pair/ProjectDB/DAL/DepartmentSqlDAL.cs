@@ -11,7 +11,7 @@ namespace ProjectDB.DAL
     public class DepartmentSqlDAL
     {
         private const string SQL_GetDepartment = "SELECT department.department_id, department.name FROM Department; ";
-        private const string SQL_CreateDepartment = @"INSERT INTO department(department.name) VALUES (@departmentname); ";
+        private const string SQL_CreateDepartment = @"IF NOT EXISTS (SELECT * FROM department WHERE department.name = @departmentname) INSERT INTO department(department.name) VALUES (@departmentname); ";
         private const string SQL_SelectDepartment = "SELECT department.department_id, department.name FROM Department WHERE name = @departmentname; ";
         private const string SQL_UpdateDepartment = @"UPDATE department SET department.name = @changeddepartmentname WHERE department.department_id= @updateddepartmentid;";
         private string connectionString;
@@ -59,12 +59,6 @@ namespace ProjectDB.DAL
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    SqlCommand cmd = new SqlCommand(SQL_SelectDepartment, conn);
-                    cmd.Parameters.AddWithValue("@departmentname", newDepartment.Name);
-                    int selectedRowsAffected = cmd.ExecuteNonQuery();
-
-                    if (selectedRowsAffected == -1)
-                    {
                         SqlCommand updcmd = new SqlCommand(SQL_CreateDepartment, conn);
 
                         updcmd.Parameters.AddWithValue("@departmentname", newDepartment.Name);
@@ -72,11 +66,6 @@ namespace ProjectDB.DAL
                         int updaterowsAffected = updcmd.ExecuteNonQuery();
 
                         return (updaterowsAffected == 1);
-                    }
-                    else
-                    {
-                        return false;
-                    }
                 }
 
             }
