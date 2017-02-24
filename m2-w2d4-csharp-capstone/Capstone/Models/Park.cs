@@ -12,7 +12,7 @@ namespace Capstone.Models
         public int ParkID { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
-        public int EstDate { get; set; }
+        public DateTime EstDate { get; set; }
         public int Area { get; set; }
         public int Visitors { get; set; }
         public string Description { get; set; }

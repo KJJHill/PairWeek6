@@ -11,10 +11,11 @@ namespace Capstone.DAL
     public class CampgroundSQLDAL
     {
         private string connectionString;
-        private const string SQLGetAllCampgroundsParkID = @"SELECT * FROM campground WHERE campground.park_id = @parkid;";
+        private const string SQLGetAllCampgroundsParkID = @"SELECT campground.campground_id, campground.name
+                                                          FROM campground 
+                                                          WHERE campground.park_id = @parkid;";
         private const string SQLGetAllCampgroundsParkIDDate = @"SELECT * FROM campground 
                             JOIN site ON site.campground_id = campground.campground_id 
-                            JOIN reservation ON reservation.site_id = site.site_id
                             WHERE park.park_id = @parkid
                             AND @startdatemonth BETWEEN(open_from_mm) AND(open_to_mm)
                             AND @enddatemonth BETWEEN(open_from_mm) and(open_to_mm)
@@ -51,11 +52,7 @@ namespace Capstone.DAL
                     {
                         Campground c = new Campground();
                         c.CampID = Convert.ToInt32(reader["campground_id"]);
-                        c.ParkID = Convert.ToInt32(reader["park_id"]);
                         c.Name = Convert.ToString(reader["name"]);
-                        c.OpenFromMonth = Convert.ToInt32(reader["open_from_mm"]);
-                        c.OpenToMonth = Convert.ToInt32(reader["open_to_mm"]);
-                        c.DailyFee = Convert.ToDouble(reader["daily_fee"]);
 
                         output.Add(c);
                     }

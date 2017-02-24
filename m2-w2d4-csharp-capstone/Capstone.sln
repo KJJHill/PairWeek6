@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capstone", "Capstone\Capstone.csproj", "{A715D926-A478-4098-A01C-D7D241F4FBF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capstone.Tests", "Capstone.Tests\Capstone.Tests.csproj", "{10669F38-A784-4F5F-9B71-60EB7E89FBC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capstone.Tests", "Capstone2\Capstone.Tests.csproj", "{88163FF7-B869-4A7C-801C-0A7B7C9C1784}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{A715D926-A478-4098-A01C-D7D241F4FBF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A715D926-A478-4098-A01C-D7D241F4FBF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A715D926-A478-4098-A01C-D7D241F4FBF0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10669F38-A784-4F5F-9B71-60EB7E89FBC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10669F38-A784-4F5F-9B71-60EB7E89FBC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10669F38-A784-4F5F-9B71-60EB7E89FBC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10669F38-A784-4F5F-9B71-60EB7E89FBC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88163FF7-B869-4A7C-801C-0A7B7C9C1784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88163FF7-B869-4A7C-801C-0A7B7C9C1784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88163FF7-B869-4A7C-801C-0A7B7C9C1784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88163FF7-B869-4A7C-801C-0A7B7C9C1784}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

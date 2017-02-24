@@ -18,6 +18,8 @@ namespace Capstone
         const string Command_Quit = "q";
         const string Command_StartOver = "s";
         string connectionString = ConfigurationManager.ConnectionStrings["CapstoneDatabase"].ConnectionString;
+        public Reservation newReservation = new Reservation();
+        public Campsite newCampsite = new Campsite();
 
         public void RunCLI()
         {
@@ -59,12 +61,12 @@ namespace Capstone
 
         private void PrintHeader()
         {
-            Console.WriteLine(@" _    _  _____ ______  _     ______     ______   ___   _____   ___  ______   ___   _____  _____ ");
-            Console.WriteLine(@"| |  | ||  _  || ___ \| |    |  _  \    |  _  \ / _ \ |_   _| / _ \ | ___ \ / _ \ /  ___||  ___|");
-            Console.WriteLine(@"| |  | || | | || |_/ /| |    | | | |    | | | |/ /_\ \  | |  / /_\ \| |_/ // /_\ \\ `--. | |__  ");
-            Console.WriteLine(@"| |/\| || | | ||    / | |    | | | |    | | | ||  _  |  | |  |  _  || ___ \|  _  | `--. \|  __| ");
-            Console.WriteLine(@"\  /\  /\ \_/ /| |\ \ | |____| |/ /     | |/ / | | | |  | |  | | | || |_/ /| | | |/\__/ /| |___ ");
-            Console.WriteLine(@" \/  \/  \___/ \_| \_|\_____/|___/      |___/  \_| |_/  \_/  \_| |_/\____/ \_| |_/\____/ \____/ ");
+            //    Console.WriteLine(@" _    _  _____ ______  _     ______     ______   ___   _____   ___  ______   ___   _____  _____ ");
+            //    Console.WriteLine(@"| |  | ||  _  || ___ \| |    |  _  \    |  _  \ / _ \ |_   _| / _ \ | ___ \ / _ \ /  ___||  ___|");
+            //    Console.WriteLine(@"| |  | || | | || |_/ /| |    | | | |    | | | |/ /_\ \  | |  / /_\ \| |_/ // /_\ \\ `--. | |__  ");
+            //    Console.WriteLine(@"| |/\| || | | ||    / | |    | | | |    | | | ||  _  |  | |  |  _  || ___ \|  _  | `--. \|  __| ");
+            //    Console.WriteLine(@"\  /\  /\ \_/ /| |\ \ | |____| |/ /     | |/ / | | | |  | |  | | | || |_/ /| | | |/\__/ /| |___ ");
+            //    Console.WriteLine(@" \/  \/  \___/ \_| \_|\_____/|___/      |___/  \_| |_/  \_/  \_| |_/\____/ \_| |_/\____/ \____/ ");
         }
 
         private void PrintMainMenu()
@@ -85,7 +87,6 @@ namespace Capstone
             Console.WriteLine("Choose a Campsite - Type in a command");
             Console.WriteLine(" 1 - Choose A Campsite By Park Id");
             Console.WriteLine(" 2 - Choose A Campsite By Available Dates");
-            Console.WriteLine(" 3 - Choose A Campsite by...");
             Console.WriteLine(" S - Start Over");
             Console.WriteLine(" Q - Quit");
 
@@ -100,11 +101,7 @@ namespace Capstone
                     break;
 
                 case "2":
-                    //DisplayCampsiteMenu();
-                    break;
-
-                case "3":
-                    //GetReservations();
+                    GetDates();
                     break;
 
                 case "s":
@@ -138,7 +135,7 @@ namespace Capstone
         private void GetAllParksLongDisplay()
         {
             ParkSQLDAL dal = new ParkSQLDAL(connectionString);
-            List<Park> parks = dal.GetAllParksDescription();
+            List<Park> parks = dal.GetAllParksWithFullDescription();
 
             foreach (var park in parks)
             {
@@ -149,13 +146,14 @@ namespace Capstone
         private void GetAllParksShortDisplay()
         {
             ParkSQLDAL dal = new ParkSQLDAL(connectionString);
-            List<Park> parks = dal.GetParksShort();
+            List<Park> parks = dal.GetAllParksShortened();
 
             Console.WriteLine();
             Console.WriteLine();
+
             foreach (var park in parks)
             {
-                Console.WriteLine(park);
+                Console.WriteLine(park.ParkID + "- " + park.Name);
             }
         }
 
@@ -163,17 +161,112 @@ namespace Capstone
         {
             GetAllParksShortDisplay();
 
+            Console.WriteLine();
             Console.WriteLine("Please Enter the Park Id...");
+            newCampsite.ParkId = int.Parse(Console.ReadLine());
 
-            int parkId = Convert.ToInt32(Console.ReadKey());
-           
+            Console.WriteLine("Do you wish to search the whole (p)ark or a specific (c)ampground? ");
+            string userChoice = Console.ReadLine();
+
             CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
-            List<Campsite> campsites = dal.GetCampsitesByParkId(parkId);
+            List<Campsite> campsites = new List<Campsite>();
 
+            if (userChoice == "p")
+            {
+                campsites = dal.GetCampsitesByParkId(newCampsite.ParkId);
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else if (userChoice == "c")
+            {
+                DisplayCampgrounds();
+
+                Console.WriteLine("Please enter a choice for campground...");
+
+                newCampsite.CampgroundId = int.Parse(Console.ReadLine());
+                campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
+
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input. Please Start Again...");
+            }
+
+        }
+
+        public void DisplayCampsiteAndReservations(List<Campsite> campsites)
+        {
             foreach (var campsite in campsites)
             {
                 Console.WriteLine(campsite);
             }
+
+            Console.WriteLine();
+            Console.WriteLine("Do you want to make a reservation?");
+
+            if (Console.ReadLine().ToUpper() == "Y")
+            {
+                ReservationSQLDAL resDal = new ReservationSQLDAL(connectionString);
+
+                Console.WriteLine("Please Enter the Campsite Id...");
+                newReservation.SiteId = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("What is the last name for the reservation?");
+                newReservation.Name = Console.ReadLine();
+
+                if (newReservation.ToDate == DateTime.MinValue)
+                {
+                    Console.WriteLine("What is the start date for your travel? (dd/mm/yy)");
+                    newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
+
+                    Console.WriteLine("What is the end date for your travel? (dd/mm/yy)");
+                    newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+                }
+
+                resDal.AddNewReservation(newReservation);
+
+                Console.WriteLine(newReservation);
+            }
         }
-   }
+
+        public void DisplayCampgrounds()
+        {
+            CampgroundSQLDAL dal = new CampgroundSQLDAL(connectionString);
+            List<Campground> campgrounds = dal.GetAllCampgroundsParkID(newCampsite.ParkId);
+
+            foreach (var campground in campgrounds)
+            {
+                Console.WriteLine(campground);
+            }
+        }
+
+        public void GetDates()
+        {
+            Console.WriteLine("What is the start date for your travel? (dd/mm/yy)");
+            newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("What is the end date for your travel? (dd/mm/yy)");
+            newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Do you wish to display campsites by (a)ll parks or a (s)pecific park?");
+            string userChoice = Console.ReadLine().ToUpper();
+
+            if (userChoice == "A")
+            {
+
+            }
+            else if (userChoice == "S")
+            {
+
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input. Please Start Again...");
+            }
+
+
+
+        }
+    }
+
 }

@@ -15,7 +15,7 @@ namespace Capstone.DAL
         bool limitOptions = false;
 
         private string SQL_MainClause =
-            @"SELECT TOP 5 site.site_id, site.site_number, park.park_id, park.name as park_name, 
+            @"SELECT TOP 5 park.park_id, park.name as park_name, site.site_id,   
             campground.campground_id, campground.name as campground_name, site.accessible, site.utilities, 
             site.max_rv_length, site.max_occupancy, campground.daily_fee
             FROM park 
@@ -197,7 +197,6 @@ namespace Capstone.DAL
             {
                 Campsite c = new Campsite();
                 c.SiteId = Convert.ToInt32(reader["site_id"]);
-                c.SiteNumber = Convert.ToInt32(reader["site_number"]);
                 c.ParkId = Convert.ToInt32(reader["park_id"]);
                 c.ParkName = Convert.ToString(reader["park_name"]);
                 c.CampgroundId = Convert.ToInt32(reader["campground_id"]);

@@ -52,7 +52,7 @@ namespace Capstone.DAL
                         p.ParkID = Convert.ToInt32(reader["park_id"]);
                         p.Name = Convert.ToString(reader["name"]);
                         p.Location = Convert.ToString(reader["location"]);
-                        p.EstDate = Convert.ToInt32(reader["establish_date"]);
+                        p.EstDate = Convert.ToDateTime(reader["establish_date"]);
                         p.Area = Convert.ToInt32(reader["area"]);
                         p.Visitors = Convert.ToInt32(reader["visitors"]);
                         p.Description = Convert.ToString(reader["description"]);
