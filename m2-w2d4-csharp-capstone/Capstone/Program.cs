@@ -12,9 +12,11 @@ namespace Capstone
     {
         static void Main(string[] args)
         {
+
             ParkReservationCLI cli = new ParkReservationCLI();
             cli.RunCLI();
             //string connectionString = ConfigurationManager.ConnectionStrings["CapstoneDatabase"].ConnectionString;
+            
         }
     }
 }
