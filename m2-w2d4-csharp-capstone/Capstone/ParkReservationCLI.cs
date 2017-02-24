@@ -97,7 +97,7 @@ namespace Capstone
             switch (command.ToLower())
             {
                 case "1":
-                    GetCampsiteByParkID();
+                    DisplayParkforParkID();
                     break;
 
                 case "2":
@@ -157,7 +157,7 @@ namespace Capstone
             }
         }
 
-        private void GetCampsiteByParkID()
+        private void DisplayParkforParkID()
         {
             GetAllParksShortDisplay();
 
@@ -173,17 +173,36 @@ namespace Capstone
 
             if (userChoice == "p")
             {
-                campsites = dal.GetCampsitesByParkId(newCampsite.ParkId);
-                DisplayCampsiteAndReservations(campsites);
+                OfferDateRangeByParkID();
             }
             else if (userChoice == "c")
             {
-                DisplayCampgrounds();
+                DisplayCampgrounds(false);
 
                 Console.WriteLine("Please enter a choice for campground...");
 
                 newCampsite.CampgroundId = int.Parse(Console.ReadLine());
                 campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
+
+                Console.WriteLine("Do you want to choose a date range? (Y/N)");
+                string dateChoice = Console.ReadLine().ToUpper();
+
+                if (dateChoice == "N")
+                {
+                    campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
+                    DisplayCampsiteAndReservations(campsites);
+                }
+                else
+                {
+                    Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
+                    newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
+
+                    Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
+                    newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+
+                    campsites = dal.GetCampsitesByParkCampgroundAndAvailableDates(newCampsite.ParkId, newCampsite.CampgroundId, newReservation.FromDate, newReservation.ToDate);
+                    DisplayCampsiteAndReservations(campsites);
+                }
 
                 DisplayCampsiteAndReservations(campsites);
             }
@@ -216,36 +235,49 @@ namespace Capstone
 
                 if (newReservation.ToDate == DateTime.MinValue)
                 {
-                    Console.WriteLine("What is the start date for your travel? (dd/mm/yy)");
+                    Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
                     newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
 
-                    Console.WriteLine("What is the end date for your travel? (dd/mm/yy)");
+                    Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
                     newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
                 }
 
                 resDal.AddNewReservation(newReservation);
 
+                
                 Console.WriteLine(newReservation);
             }
         }
 
-        public void DisplayCampgrounds()
+        public void DisplayCampgrounds(bool datesAreGiven)
         {
             CampgroundSQLDAL dal = new CampgroundSQLDAL(connectionString);
-            List<Campground> campgrounds = dal.GetAllCampgroundsParkID(newCampsite.ParkId);
+            List<Campground> campgrounds = new List<Campground>();
+
+            if (datesAreGiven)
+            {
+                campgrounds = dal.GetAllCampgroundsParkIDDate(newCampsite.ParkId,newReservation.FromDate, newReservation.ToDate);
+            }
+            else
+            {
+                campgrounds = dal.GetAllCampgroundsParkID(newCampsite.ParkId);
+            }
 
             foreach (var campground in campgrounds)
             {
-                Console.WriteLine(campground);
+                Console.WriteLine(campground.CampID + "- " + campground.Name);
             }
         }
 
         public void GetDates()
         {
-            Console.WriteLine("What is the start date for your travel? (dd/mm/yy)");
+            CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
+            List<Campsite> campsites = new List<Campsite>();
+
+            Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
             newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
 
-            Console.WriteLine("What is the end date for your travel? (dd/mm/yy)");
+            Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
             newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
 
             Console.WriteLine("Do you wish to display campsites by (a)ll parks or a (s)pecific park?");
@@ -253,19 +285,78 @@ namespace Capstone
 
             if (userChoice == "A")
             {
-
+                campsites = dal.GetCampsitesByAvailableDates(newReservation.FromDate, newReservation.ToDate);
+                DisplayCampsiteAndReservations(campsites);
             }
             else if (userChoice == "S")
             {
-
+                DisplayParkforParkIDAndDate();
             }
             else
             {
                 Console.WriteLine("Invalid Input. Please Start Again...");
             }
 
+        }
+        public void DisplayParkforParkIDAndDate()
+        {
+            GetAllParksShortDisplay();
 
+            Console.WriteLine();
+            Console.WriteLine("Please Enter the Park Id...");
+            newCampsite.ParkId = int.Parse(Console.ReadLine());
 
+            Console.WriteLine("Do you wish to search the whole (p)ark or a specific (c)ampground? ");
+            string userChoice = Console.ReadLine();
+
+            CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
+            List<Campsite> campsites = new List<Campsite>();
+
+            if (userChoice == "p")
+            {
+                campsites = dal.GetCampsitesByParkIdAndAvailableDates(newCampsite.ParkId, newReservation.FromDate, newReservation.ToDate);
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else if (userChoice == "c")
+            {
+                DisplayCampgrounds(true);
+
+                Console.WriteLine("Please enter a choice for campground...");
+
+                newCampsite.CampgroundId = int.Parse(Console.ReadLine());
+                campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
+
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input. Please Start Again...");
+            }
+
+        }
+
+        public void OfferDateRangeByParkID()
+        {
+            CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
+            List<Campsite> campsites = new List<Campsite>();
+            Console.WriteLine("Do you want to choose a date range? (Y/N)");
+            string dateChoice = Console.ReadLine().ToUpper();
+            if (dateChoice == "N")
+            {
+                campsites = dal.GetCampsitesByParkId(newCampsite.ParkId);
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else
+            {
+                Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
+                newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
+
+                Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
+                newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+
+                campsites = dal.GetCampsitesByParkIdAndAvailableDates(newCampsite.ParkId, newReservation.FromDate, newReservation.ToDate);
+                DisplayCampsiteAndReservations(campsites);
+            }
         }
     }
 

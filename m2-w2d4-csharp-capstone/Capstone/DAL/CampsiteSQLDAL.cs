@@ -76,13 +76,10 @@ namespace Capstone.DAL
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(SQL_MainClause, conn);
-
-                    cmd = AddAvailableDateParameters(cmd, fromDate, toDate);
-
-                    //cmd.Parameters.AddWithValue("@fromDate", fromDate.ToShortDateString());
-                    //cmd.Parameters.AddWithValue("@toDate", toDate.ToShortDateString());
-                    //cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
-                    //cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
+                    cmd.Parameters.AddWithValue("@fromDate", fromDate.ToShortDateString());
+                    cmd.Parameters.AddWithValue("@toDate", toDate.ToShortDateString());
+                    cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
+                    cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
 
                     return GetListOfCampsites(cmd);
                 }
@@ -98,7 +95,7 @@ namespace Capstone.DAL
         {
             try
             {
-                SQL_MainClause += " park.park_id = {parkId} " + SQL_AvailableDatesClause;
+                SQL_MainClause += " park.park_id = @parkId " + SQL_AvailableDatesClause;
 
                 SQL_MainClause += (limitOptions) ? SQL_AddLimitOptionsClause() : "";
 
@@ -107,14 +104,11 @@ namespace Capstone.DAL
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(SQL_MainClause, conn);
-
-                    cmd = AddAvailableDateParameters(cmd, fromDate, toDate);
-
-                    //cmd.Parameters.AddWithValue("@parkId", parkId);
-                    //cmd.Parameters.AddWithValue("@fromDate", fromDate);
-                    //cmd.Parameters.AddWithValue("@toDate", toDate);
-                    //cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
-                    //cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
+                    cmd.Parameters.AddWithValue("@parkId", parkId);
+                    cmd.Parameters.AddWithValue("@fromDate", fromDate);
+                    cmd.Parameters.AddWithValue("@toDate", toDate);
+                    cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
+                    cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
 
                     return GetListOfCampsites(cmd);
                 }
@@ -157,7 +151,7 @@ namespace Capstone.DAL
         {
             try
             {
-                SQL_MainClause += " park.park_id = {parkId} AND campground.campground_id = {campgroundId} AND "
+                SQL_MainClause += " park.park_id = @parkId AND campground.campground_id = @campgroundId AND "
                                 + SQL_AvailableDatesClause;
 
                 SQL_MainClause += (limitOptions) ? SQL_AddLimitOptionsClause() : "";
@@ -167,15 +161,15 @@ namespace Capstone.DAL
                     conn.Open();
                     SqlCommand cmd = new SqlCommand(SQL_MainClause, conn);
 
-                    cmd = AddAvailableDateParameters(cmd, fromDate, toDate);
+                    //cmd = AddAvailableDateParameters(cmd, fromDate, toDate);
 
-                    //cmd.Parameters.AddWithValue("@parkId", parkId);
-                    //cmd.Parameters.AddWithValue("@campgroundId", campgroundId);
+                    cmd.Parameters.AddWithValue("@parkId", parkId);
+                    cmd.Parameters.AddWithValue("@campgroundId", campgroundId);
 
-                    //cmd.Parameters.AddWithValue("@fromDate", fromDate);
-                    //cmd.Parameters.AddWithValue("@toDate", toDate);
-                    //cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
-                    //cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
+                    cmd.Parameters.AddWithValue("@fromDate", fromDate);
+                    cmd.Parameters.AddWithValue("@toDate", toDate);
+                    cmd.Parameters.AddWithValue("@reservationFromMonth", fromDate.Month);
+                    cmd.Parameters.AddWithValue("@reservationToMonth", toDate.Month);
 
                     return GetListOfCampsites(cmd);
                 }
