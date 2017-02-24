@@ -47,14 +47,19 @@
     <Compile Include="DAL\CampgroundSQLDAL.cs" />
     <Compile Include="DAL\CampsiteSQLDAL.cs" />
     <Compile Include="DAL\ParkSQLDAL.cs" />
+    <Compile Include="DAL\ReservationSQLDAL.cs" />
     <Compile Include="Models\Campground.cs" />
     <Compile Include="Models\Campsite.cs" />
     <Compile Include="Models\Park.cs" />
+    <Compile Include="Models\Reservation.cs" />
+    <Compile Include="ParkReservationCLI.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

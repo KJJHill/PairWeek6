@@ -13,7 +13,7 @@ namespace ProjectDBTest
     {
 
         private TransactionScope tran;
-        private string connectionString = @"Data Source=DESKTOP-4EOMNFH\sqlexpress;Initial Catalog=ProjectExercise;Integrated Security=True";
+        private string connectionString = @"Data Source=DESKTOP-ICT08NO\sqlexpress;Initial Catalog=ProjectExercise;Integrated Security=True";
         List<string> allDepartments = new List<string>();
         int departmentCount = 0;
 

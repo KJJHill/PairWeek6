@@ -13,7 +13,7 @@ namespace ProjectDB.DAL
         private const string SQL_GetDepartment = "SELECT department.department_id, department.name FROM Department; ";
         private const string SQL_CreateDepartment = @"IF NOT EXISTS (SELECT * FROM department WHERE department.name = @departmentname) INSERT INTO department(department.name) VALUES (@departmentname); ";
         private const string SQL_SelectDepartment = "SELECT department.department_id, department.name FROM Department WHERE name = @departmentname; ";
-        private const string SQL_UpdateDepartment = @"UPDATE department SET department.name = @changeddepartmentname WHERE department.department_id= @updateddepartmentid;";
+        private const string SQL_UpdateDepartment = @"UPDATE department SET department.name = @changeddepartmentname WHERE department.department_id= @updateddepartmentid";
         private string connectionString;
 
         // Single Parameter Constructor
@@ -32,20 +32,21 @@ namespace ProjectDB.DAL
                     conn.Open();
                     SqlCommand cmd = new SqlCommand(SQL_GetDepartment, conn);
 
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    output = GetCollectionDepartments(cmd);
+                    //SqlDataReader reader = cmd.ExecuteReader();
 
-                    while (reader.Read())
-                    {
-                        Department d = new Department();
-                        d.Id= Convert.ToInt32(reader["department_id"]);
-                        d.Name = Convert.ToString(reader["name"]);
+                    //while (reader.Read())
+                    //{
+                    //    Department d = new Department();
+                    //    d.Id= Convert.ToInt32(reader["department_id"]);
+                    //    d.Name = Convert.ToString(reader["name"]);
 
-                        output.Add(d);
-                    }
+                    //    output.Add(d);
+                    //}
                 }
-                
+
             }
-            catch(SqlException ex)
+            catch (SqlException ex)
             {
                 throw new NotImplementedException();
             }
@@ -59,13 +60,13 @@ namespace ProjectDB.DAL
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                        SqlCommand updcmd = new SqlCommand(SQL_CreateDepartment, conn);
+                    SqlCommand updcmd = new SqlCommand(SQL_CreateDepartment, conn);
 
-                        updcmd.Parameters.AddWithValue("@departmentname", newDepartment.Name);
+                    updcmd.Parameters.AddWithValue("@departmentname", newDepartment.Name);
 
-                        int updaterowsAffected = updcmd.ExecuteNonQuery();
+                    int updaterowsAffected = updcmd.ExecuteNonQuery();
 
-                        return (updaterowsAffected == 1);
+                    return (updaterowsAffected == 1);
                 }
 
             }
@@ -73,7 +74,7 @@ namespace ProjectDB.DAL
             {
                 throw new NotImplementedException();
             }
-            
+
         }
 
         public bool UpdateDepartment(Department updatedDepartment)
@@ -84,7 +85,7 @@ namespace ProjectDB.DAL
                 {
                     conn.Open();
                     SqlCommand cmd = new SqlCommand(SQL_UpdateDepartment, conn);
-                    cmd.Parameters.AddWithValue("@updateddepartmentid", updatedDepartment.Id); 
+                    cmd.Parameters.AddWithValue("@updateddepartmentid", updatedDepartment.Id);
                     cmd.Parameters.AddWithValue("@changeddepartmentname", updatedDepartment.Name);
 
                     int rowsAffected = cmd.ExecuteNonQuery();
@@ -98,6 +99,23 @@ namespace ProjectDB.DAL
                 throw new NotImplementedException();
             }
 
+        }
+
+        public List<Department> GetCollectionDepartments(SqlCommand cmd)
+        {
+            List<Department> output = new List<Department>();
+
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Department d = new Department();
+                d.Id = Convert.ToInt32(reader["department_id"]);
+                d.Name = Convert.ToString(reader["name"]);
+
+                output.Add(d);
+            }
+            return output;
         }
 
     }
