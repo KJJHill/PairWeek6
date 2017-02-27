@@ -22,9 +22,11 @@ namespace Capstone.Models
 
         public override string ToString()
         {
-            return " Campsite id: " + SiteId.ToString().PadRight(3) + CampgroundId.ToString().PadRight(3) + SiteNumber.ToString().PadRight(3)
-                + MaxOccupancy.ToString().PadRight(3) + Accessible.PadRight(3) + MaxRVLength.ToString().PadRight(3)
-                + Utilities.PadRight(3) + ParkName.PadRight(10) + CampgroundName.PadRight(10) + DailyFee.ToString().PadRight(5) ;
+            //return "\r\n" + "Campsite id: " + SiteId.ToString().PadRight(3) + "Campground- " + CampgroundId.ToString() + ":" + CampgroundName.ToString().PadRight(5)
+            //    + "Park: ".PadRight(5) + ParkName.PadLeft(10) + "\r\n" + "Max Occupancy: " + MaxOccupancy.ToString().PadRight(3) + "WheelChair Accessible: " + Accessible.PadRight(3) + "Max RV Length: " + MaxRVLength.ToString().PadRight(3)
+            //    + "Utilities Available:" + Utilities.PadRight(3) + "Daily Fee: " + DailyFee.ToString().PadRight(5) + "\r\n";
+
+            return string.Format("\r\nCampsite ID: {0}     Campground ID and Name: {1}-{2}     Park Name: {3} \r\nMax Occupancy: {4}     WheelChair Accessible: {5}     Max RV Length: {6}     Utilities Available: {7}     Daily Fee: {8}\r\n", SiteId, CampgroundId, CampgroundName, ParkName, MaxOccupancy, Accessible, MaxRVLength, Utilities, DailyFee);
         }
     }
 }
