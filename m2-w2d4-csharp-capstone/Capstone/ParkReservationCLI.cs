@@ -352,7 +352,7 @@ namespace Capstone
                 campsites = dal.GetCampsitesByParkId(newCampsite.ParkId);
                 DisplayCampsiteAndReservations(campsites);
             }
-            else
+            else if (dateChoice == "Y")
             {
                 Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
                 newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
