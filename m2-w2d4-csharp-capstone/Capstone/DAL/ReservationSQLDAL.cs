@@ -18,7 +18,8 @@ namespace Capstone.DAL
                 FROM reservation r
                 JOIN site s on r.site_id = s.site_id
                 JOIN campground c on s.campground_id = c.campground_id
-                JOIN park p on p.park_id = c.park_id";
+                JOIN park p on p.park_id = c.park_id
+				WHERE r.from_date between GETDATE() and DATEADD(month, 1, GETDATE())";
 
         private string SQL_GetReservationNumber = @"SELECT reservation_id from reservation where name = @name and from_date = @fromDate and to_date = @toDate";
 
@@ -26,21 +27,20 @@ namespace Capstone.DAL
         //campground is open and that the reservations are not for the date range entered
         private string SQL_InsertReservation =
                 @"if (@siteId in (SELECT distinct site.site_id FROM campground
-                
                 JOIN site ON site.campground_id = campground.campground_id
-                JOIN reservation ON reservation.site_id = site.site_id
-                
                 WHERE @reservationFromMonth BETWEEN (open_from_mm) AND (open_to_mm) 
                 AND @reservationToMonth BETWEEN (open_from_mm) AND (open_to_mm)
                 
-                AND(from_date NOT BETWEEN @fromDate AND @toDate)
-                AND(to_date NOT BETWEEN @fromDate AND @toDate)
+                AND site.site_id NOT IN
+                
+                (SELECT site_id FROM reservation
+                WHERE (from_date BETWEEN(@fromDate) AND (@toDate))
+                OR (to_date BETWEEN(@fromDate) AND (@toDate))
+                OR ((@fromDate) BETWEEN from_date AND to_date)
+                OR((@toDate) BETWEEN from_date AND to_date))))
 
-                AND((@fromDate NOT BETWEEN (from_date) AND(to_date))
-                AND(@toDate NOT BETWEEN (from_date) AND(to_date)))))
-
-                INSERT INTO reservation (site_id, name, from_date, to_date)
-                VALUES (@siteId, @name, @fromDate, @toDate)";
+               INSERT INTO reservation (site_id, name, from_date, to_date)
+               VALUES (@siteId, @name, @fromDate, @toDate)";
 
         public ReservationSQLDAL(string databaseConnectionString)
         {
@@ -75,7 +75,7 @@ namespace Capstone.DAL
                         cmd.Parameters.AddWithValue("@name", newReservation.Name);
                         cmd.Parameters.AddWithValue("@fromDate", newReservation.FromDate);
 
-                        output = Convert.ToInt32(cmd.ExecuteScalar());
+                        newReservation.ReservationId = Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }
