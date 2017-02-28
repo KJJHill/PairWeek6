@@ -21,36 +21,28 @@ namespace Capstone.DAL
                 JOIN park p on p.park_id = c.park_id
 				WHERE r.from_date between GETDATE() and DATEADD(month, 1, GETDATE())";
 
-        private string SQL_GetReservationNumber = @"SELECT reservation_id from reservation where name = @name and from_date = @fromDate and to_date = @toDate";
+        private string SQL_GetReservationNumber = @"SELECT reservation_id, campground_id from reservation join site on reservation.site_id = site.site_id where name = @name and from_date = @fromDate and to_date = @toDate";
 
-        //this verifies that the site id is in a list of sites where the 
+        //this verifies that the site id is not in a list of sites where the 
         //campground is open and that the reservations are not for the date range entered
-        private string SQL_InsertReservation =
-                @"if (@siteId in (SELECT distinct site.site_id FROM campground
-                JOIN site ON site.campground_id = campground.campground_id
-                WHERE @reservationFromMonth BETWEEN (open_from_mm) AND (open_to_mm) 
-                AND @reservationToMonth BETWEEN (open_from_mm) AND (open_to_mm)
-                
-                AND site.site_id NOT IN
-                
-                (SELECT site_id FROM reservation
-                WHERE (from_date BETWEEN(@fromDate) AND (@toDate))
-                OR (to_date BETWEEN(@fromDate) AND (@toDate))
-                OR ((@fromDate) BETWEEN from_date AND to_date)
-                OR((@toDate) BETWEEN from_date AND to_date))))
+        private string SQL_InsertReservation = @"if (@siteId not in
+                                             
+                                             (SELECT site_id FROM reservation
+                                              WHERE from_date BETWEEN(@fromDate) AND(@toDate)
+                                              OR(to_date BETWEEN(@fromDate) AND(@toDate))
+                                              OR((@fromDate) BETWEEN from_date AND to_date)
+                                              OR((@toDate) BETWEEN from_date AND to_date))) 
 
-               INSERT INTO reservation (site_id, name, from_date, to_date)
-               VALUES (@siteId, @name, @fromDate, @toDate)";
+                                              INSERT INTO reservation(site_id, name, from_date, to_date)
+                                              VALUES(@siteId, @name, @fromDate, @toDate)";
 
         public ReservationSQLDAL(string databaseConnectionString)
         {
             connectionString = databaseConnectionString;
         }
 
-        public int AddNewReservation(Reservation newReservation)
+        public void AddNewReservation(Reservation newReservation)
         {
-            int output = -1;
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -75,7 +67,11 @@ namespace Capstone.DAL
                         cmd.Parameters.AddWithValue("@name", newReservation.Name);
                         cmd.Parameters.AddWithValue("@fromDate", newReservation.FromDate);
 
-                        newReservation.ReservationId = Convert.ToInt32(cmd.ExecuteScalar());
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        reader.Read();
+
+                        newReservation.CampgroundId = Convert.ToInt32(reader["campground_id"]);
+                        newReservation.ReservationId = Convert.ToInt32(reader["reservation_id"]);
                     }
                 }
             }
@@ -85,7 +81,6 @@ namespace Capstone.DAL
                 throw;
             }
 
-            return output;
         }
 
         public List<Reservation> GetAllReservations()

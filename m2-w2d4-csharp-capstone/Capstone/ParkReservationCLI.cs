@@ -107,7 +107,7 @@ namespace Capstone
                     break;
 
                 case "2":
-                    GetDates();
+                    GetReservationDates();
                     break;
 
                 case "s":
@@ -115,7 +115,7 @@ namespace Capstone
                     break;
 
                 case "q":
-                    Console.WriteLine("Thank you for using the Park Reservation cli app");
+                    Console.WriteLine("Thank you for using the National Park Reservation cli app");
                     return;
 
                 default:
@@ -134,6 +134,7 @@ namespace Capstone
 
             foreach (var reservation in reservations)
             {
+                Console.WriteLine();
                 Console.WriteLine(reservation);
             }
         }
@@ -188,7 +189,6 @@ namespace Capstone
                 Console.WriteLine("Please enter a choice for campground...");
 
                 newCampsite.CampgroundId = int.Parse(Console.ReadLine());
-                campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
 
                 Console.WriteLine("Do you want to choose a date range? (Y/N)");
                 string dateChoice = Console.ReadLine().ToUpper();
@@ -196,18 +196,12 @@ namespace Capstone
                 if (dateChoice == "N")
                 {
                     campsites = dal.GetCampsitesByParkIdAndCampgroundId(newCampsite.ParkId, newCampsite.CampgroundId);
-                    DisplayCampsiteAndReservations(campsites);
                 }
                 else if (dateChoice == "Y")
                 {
-                    Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
-                    newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
-
-                    Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
-                    newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+                    AskForTravelDates();
 
                     campsites = dal.GetCampsitesByParkCampgroundAndAvailableDates(newCampsite.ParkId, newCampsite.CampgroundId, newReservation.FromDate, newReservation.ToDate);
-                    DisplayCampsiteAndReservations(campsites);
                 }
 
                 DisplayCampsiteAndReservations(campsites);
@@ -241,17 +235,19 @@ namespace Capstone
 
                 if (newReservation.ToDate == DateTime.MinValue)
                 {
-                    Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
-                    newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
-
-                    Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
-                    newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+                    AskForTravelDates();
                 }
 
                 resDal.AddNewReservation(newReservation);
 
-                
-                Console.WriteLine(newReservation);
+                if (newReservation.ReservationId > 0)
+                {
+                    Console.WriteLine(newReservation);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Date Range.");
+                }
             }
         }
 
@@ -275,16 +271,12 @@ namespace Capstone
             }
         }
 
-        public void GetDates()
+        public void GetReservationDates()
         {
             CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
             List<Campsite> campsites = new List<Campsite>();
 
-            Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
-            newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
-
-            Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
-            newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
+            AskForTravelDates();
 
             Console.WriteLine("Do you wish to display campsites by (a)ll parks or a (s)pecific park?");
             string userChoice = Console.ReadLine().ToUpper();
@@ -345,8 +337,10 @@ namespace Capstone
         {
             CampsiteSQLDAL dal = new CampsiteSQLDAL(connectionString, false);
             List<Campsite> campsites = new List<Campsite>();
+
             Console.WriteLine("Do you want to choose a date range? (Y/N)");
             string dateChoice = Console.ReadLine().ToUpper();
+
             if (dateChoice == "N")
             {
                 campsites = dal.GetCampsitesByParkId(newCampsite.ParkId);
@@ -354,15 +348,24 @@ namespace Capstone
             }
             else if (dateChoice == "Y")
             {
+                AskForTravelDates();
+
+                campsites = dal.GetCampsitesByParkIdAndAvailableDates(newCampsite.ParkId, newReservation.FromDate, newReservation.ToDate);
+                DisplayCampsiteAndReservations(campsites);
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input...");
+            }
+        }
+
+        public void AskForTravelDates()
+        {
                 Console.WriteLine("What is the start date for your travel? (mm/dd/yy)");
                 newReservation.FromDate = Convert.ToDateTime(Console.ReadLine());
 
                 Console.WriteLine("What is the end date for your travel? (mm/dd/yy)");
                 newReservation.ToDate = Convert.ToDateTime(Console.ReadLine());
-
-                campsites = dal.GetCampsitesByParkIdAndAvailableDates(newCampsite.ParkId, newReservation.FromDate, newReservation.ToDate);
-                DisplayCampsiteAndReservations(campsites);
-            }
         }
     }
 

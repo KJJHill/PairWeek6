@@ -22,14 +22,14 @@ namespace Capstone.Models
 
         public override string ToString()
         {
-            return "The reservation confirmation #" + ReservationId.ToString().PadRight(3) 
-                + "is at "+ ParkName + " park and at " 
-                + CampgroundName + "which is campground #" + CampgroundId 
-                + " at site #" + SiteId.ToString().PadRight(3)  
-                + "for " + Name.PadRight(15)  
-                + " from " + FromDate.ToString("D") 
+            return "Reservation confirmation #" + ReservationId.ToString() 
+                + " is for " + Name.PadRight(7)  
+                + " \n at "+ ParkName + " park and at " 
+                + CampgroundName + " campground (#" + CampgroundId 
+                + ") at site #" + SiteId.ToString().PadRight(3)  
+                + "\n from " + FromDate.ToString("D") 
                 + " to " + ToDate.ToString("D")
-                + " created on " + CreateDate.ToString("D");
+                + " and was created on " + CreateDate.ToString("D");
         }
     }
 }
