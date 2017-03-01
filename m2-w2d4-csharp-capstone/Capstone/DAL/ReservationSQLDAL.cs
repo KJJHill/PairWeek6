@@ -14,14 +14,20 @@ namespace Capstone.DAL
 
         private string SQL_GetAllReservations = @"SELECT r.reservation_id, r.create_date, 
                 r.from_date, r.to_date, r.name, r.site_id, s.site_number, c.campground_id, 
-                c.name as campground_name, p.park_id, p.name as park_name
+                c.name as campground_name, p.park_id, p.name as park_name, c.daily_fee
                 FROM reservation r
                 JOIN site s on r.site_id = s.site_id
                 JOIN campground c on s.campground_id = c.campground_id
                 JOIN park p on p.park_id = c.park_id
 				WHERE r.from_date between GETDATE() and DATEADD(month, 1, GETDATE())";
 
-        private string SQL_GetReservationNumber = @"SELECT reservation_id, campground_id from reservation join site on reservation.site_id = site.site_id where name = @name and from_date = @fromDate and to_date = @toDate";
+        private string SQL_GetReservationNumber = @"SELECT reservation_id, campground.campground_id, 
+                                        park.name as park_name, campground.name as campground_name, campground.daily_fee
+                                        from reservation 
+                                        join site on reservation.site_id = site.site_id 
+                                        join campground on campground.campground_id = site.campground_id
+                                        join park on campground.park_id = park.park_id 
+                                        where reservation.name = @name and from_date = @fromDate and to_date = @toDate";
 
         //this verifies that the site id is not in a list of sites where the 
         //campground is open and that the reservations are not for the date range entered
@@ -69,7 +75,9 @@ namespace Capstone.DAL
 
                         SqlDataReader reader = cmd.ExecuteReader();
                         reader.Read();
-
+                        newReservation.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
+                        newReservation.ParkName = Convert.ToString(reader["park_name"]);
+                        newReservation.CampgroundName = Convert.ToString(reader["campground_name"]);
                         newReservation.CampgroundId = Convert.ToInt32(reader["campground_id"]);
                         newReservation.ReservationId = Convert.ToInt32(reader["reservation_id"]);
                     }
@@ -109,6 +117,7 @@ namespace Capstone.DAL
                         r.ParkId = Convert.ToInt32(reader["park_id"]);
                         r.ParkName = Convert.ToString(reader["park_name"]);
                         r.CampgroundName = Convert.ToString(reader["campground_name"]);
+                        r.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
 
                         output.Add(r);
                     }

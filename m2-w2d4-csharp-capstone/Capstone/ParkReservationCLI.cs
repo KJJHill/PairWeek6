@@ -222,8 +222,9 @@ namespace Capstone
 
             Console.WriteLine();
             Console.WriteLine("Do you want to make a reservation?");
+            string userChoice = Console.ReadLine().ToUpper();
 
-            if (Console.ReadLine().ToUpper() == "Y")
+            if (userChoice == "Y")
             {
                 ReservationSQLDAL resDal = new ReservationSQLDAL(connectionString);
 
@@ -248,6 +249,14 @@ namespace Capstone
                 {
                     Console.WriteLine("Invalid Date Range.");
                 }
+            }
+            else if (userChoice == "N")
+            {
+                //send them back to the main menu
+            }
+            else
+            {
+                Console.WriteLine("Invalid input.");
             }
         }
 

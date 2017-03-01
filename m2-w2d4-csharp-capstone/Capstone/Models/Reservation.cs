@@ -19,17 +19,19 @@ namespace Capstone.Models
         public int ParkId { get; set; }
         public string ParkName { get; set; }
         public string CampgroundName { get; set; }
+        public decimal DailyFee { get; set; }
 
         public override string ToString()
         {
-            return "Reservation confirmation #" + ReservationId.ToString() 
-                + " is for " + Name.PadRight(7)  
-                + " \n at "+ ParkName + " park and at " 
-                + CampgroundName + " campground (#" + CampgroundId 
-                + ") at site #" + SiteId.ToString().PadRight(3)  
-                + "\n from " + FromDate.ToString("D") 
+            return "Reservation confirmation #" + ReservationId.ToString()
+                + " is for " + Name.PadRight(7)
+                + " \n at " + ParkName + " park and at "
+                + CampgroundName + " campground (#" + CampgroundId
+                + ") at site #" + SiteId.ToString().PadRight(3)
+                + "\n from " + FromDate.ToString("D")
                 + " to " + ToDate.ToString("D")
-                + " and was created on " + CreateDate.ToString("D");
+                + " and was created on " + CreateDate.ToString("D")
+                + "\n Total Cost is of stay: " + String.Format("{0:C2}", ((ToDate - FromDate).Days * DailyFee));
         }
     }
 }
